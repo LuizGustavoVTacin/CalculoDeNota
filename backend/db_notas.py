@@ -2,7 +2,9 @@ import psycopg2
 from credenciais import credenciais_db
 
 def connect_to_db():
-
+    '''
+    Função para conectar ao banco de dados
+    '''
     db = credenciais_db()
 
     try:
@@ -24,7 +26,9 @@ def connect_to_db():
         return
 
 def create_schema():
-
+    '''
+    Função para criar schema no banco de dados
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -45,7 +49,9 @@ def create_schema():
         connection.close()
 
 def create_table():
-
+    '''
+    Função para criar tabela no banco de dados
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -69,7 +75,39 @@ def create_table():
         cursor.close()
         connection.close()
 
-def create_line(avaliacao, nota = -1.0):
+def add_column():
+    '''
+    Função para adicionar coluna na tabela notas do banco de dados 'presenca'
+    '''
+    try:
+        # Tenta conexão com banco de dados
+        connection, cursor = connect_to_db()
+    except Exception as error:
+        print(f"Erro ao conectar ao banco de dados : {error}")
+        return
+    
+    try:
+        # Executa a adição da nova coluna 'pesos'
+        cursor.execute(
+            """
+            ALTER TABLE presenca.notas ADD COLUMN pesos SMALLINT
+            """
+        )
+        connection.commit() # Confirma transação
+        print("Coluna adicionada")
+
+    except Exception as error:
+        print(f"Erro ao adicionar tabela {error}")
+        connection.rollback() # Reverte a transação em caso de erro
+    finally:
+        #Fecha o cursor
+        cursor.close()
+        connection.close()
+
+def create_line(avaliacao, nota = -1.0, pesos = 0):
+    '''
+    Função para criar forma de avaliação atribuída na disciplina. Nota é opcional e padrão é -1.0
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -78,9 +116,9 @@ def create_line(avaliacao, nota = -1.0):
         cursor.execute(
             """
             INSERT INTO presenca.notas(avaliacao, nota)
-            VALUES (%s, %s);
+            VALUES (%s, %s, %s);
             """,
-            (avaliacao, nota)
+            (avaliacao, nota, pesos)
         )
         connection.commit()
         print("Linha criada com sucesso")
@@ -93,6 +131,9 @@ def create_line(avaliacao, nota = -1.0):
         connection.close()
 
 def drop_line(avaliacao):
+    '''
+    Função para remover uma linha da tabela. Pode ser usada caso uma avaliação seja removida
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -115,7 +156,10 @@ def drop_line(avaliacao):
         cursor.close()
         connection.close()
 
-def modify_line(avaliacao, nota):
+def modify_line(avaliacao, nota, pesos = 0):
+    '''
+    Função criada para modificar uma linha da tabela. Pode ser usada para alterar a nota de uma avaliação
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -139,7 +183,10 @@ def modify_line(avaliacao, nota):
         cursor.close()
         connection.close()
 
-def correct_line(avaliacao, nota, avaliacao_correct, nota_correct):
+def correct_line(avaliacao, nota, pesos, avaliacao_correct, nota_correct, pesos_correct):
+    '''
+    Função para corrigir uma linha da tabela. Pode ser usada para corrigir uma avaliação
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -148,10 +195,10 @@ def correct_line(avaliacao, nota, avaliacao_correct, nota_correct):
         cursor.execute(
             """
             UPDATE presenca.notas
-            SET avaliacao_correct = %s, nota_correct = %s
-            WHERE avaliacao = %s AND nota = %s;
+            SET avaliacao = %s, nota = %s, pesos = %s
+            WHERE avaliacao = %s
             """,
-            (avaliacao_correct, nota_correct, avaliacao, nota)
+            (avaliacao_correct, nota_correct, pesos_correct, avaliacao)
         )
         connection.commit()
         print("Linha corrigida com sucesso")
@@ -164,6 +211,9 @@ def correct_line(avaliacao, nota, avaliacao_correct, nota_correct):
         connection.close()
 
 def view_data():
+    '''
+    Função para visualizar os dados da tabela
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:

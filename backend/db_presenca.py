@@ -2,7 +2,9 @@ import psycopg2
 from credenciais import credenciais_db
 
 def connect_to_db():
-
+    '''
+    Função para conectar ao banco de dados
+    '''
     db = credenciais_db()
 
     try:
@@ -24,7 +26,9 @@ def connect_to_db():
         return
 
 def create_schema():
-
+    '''
+    Função para criar schema no banco de dados
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -45,7 +49,9 @@ def create_schema():
         connection.close()
 
 def create_table():
-
+    '''
+    Função para criar tabela no banco de dados
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -72,7 +78,10 @@ def create_table():
         cursor.close()
         connection.close()
 
-def create_line(dia, nome, fui = 0, passou_lista = 0, assinaram = 0):
+def create_line(dia, nome="ICC 2", fui = 0, passou_lista = 0, assinaram = 0):
+    '''
+    Função para adicionar uma linha com aula e dia. Colocar se fui, passou lista e assinaram é opcional
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -96,6 +105,9 @@ def create_line(dia, nome, fui = 0, passou_lista = 0, assinaram = 0):
         connection.close()
 
 def drop_line(dia, nome):
+    '''
+    Função para deletar uma linha com aula e dia
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -119,6 +131,9 @@ def drop_line(dia, nome):
         connection.close()
 
 def modify_line(dia, nome, fui, passou_lista, assinaram):
+    '''
+    Função para modificar o status de fui, passou lista e assinaram de uma linha
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -143,6 +158,9 @@ def modify_line(dia, nome, fui, passou_lista, assinaram):
         connection.close()
 
 def correct_line(dia, nome, dia_correct, nome_correct):
+    '''
+    Função para corrigir o dia e nome de uma linha
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -167,6 +185,9 @@ def correct_line(dia, nome, dia_correct, nome_correct):
         connection.close()
 
 def view_data():
+    '''
+    Função para visualizar todos os dados da tabela
+    '''
     try:
         connection, cursor = connect_to_db()
     except Exception as error:
@@ -188,6 +209,3 @@ def view_data():
     finally:
         cursor.close()
         connection.close()
-
-if __name__ == '__main__':
-    view_data()
